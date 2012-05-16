@@ -1,13 +1,11 @@
 #!/usr/bin/perl
-$WORKING_PATH="../working-dir";
-$BACKUP_PATH="../backup-dir";
-$GIT_WORKING_PATH=$WORKING_PATH . "/.git";
-$GIT_BACKUP_PATH=$BACKUP_PATH . "/.git";
+$WORKING_PATH="working-dir/";
+$BACKUP_PATH="backup-dir/";
 
 sub getLocalBranches {
     @ret = ();
 
-    $string = `git --git-dir $GIT_WORKING_PATH branch`;
+    $string = `cd $WORKING_PATH && git branch`;
     @branches = split(' ', $string);
     
     foreach $branch (@branches) {
@@ -20,11 +18,21 @@ sub getLocalBranches {
 
 sub sync {
     foreach $branch (@_) {
-        system("git --git-dir $GIT_WORKING_PATH checkout $branch");
-        system("git --git-dir $GIT_BACKUP_PATH checkout $branch");
-        system("rsync -rav --progress --size-only --exclude .git $WORKING_PATH $BACKUP_PATH");
-        system("git --git-dir $GIT_BACKUP_PATH add .");
-        system("git --git-dir $GIT_BACKUP_PATH commit -m \"backup\"");
+        print "---------------------------------------\n";
+        system("cd $WORKING_PATH && git checkout $branch"); 
+        print "---------------------------------------\n\n";
+
+        print "---------------------------------------\n";
+        system("cd $BACKUP_PATH && git checkout $branch");
+        print "---------------------------------------\n\n";
+
+        print "---------------------------------------\n";
+        system("rsync -rav --delete --exclude .git/ $WORKING_PATH $BACKUP_PATH");
+        print "---------------------------------------\n\n";
+
+        print "---------------------------------------\n";
+        system("cd $BACKUP_PATH && git add . && git commit -m \"backup\"");
+        print "---------------------------------------\n\n";
     }
 }
 
