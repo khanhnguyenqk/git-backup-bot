@@ -31,7 +31,7 @@ sub sync {
         print "---------------------------------------\n\n";
 
         print "---------------------------------------\n";
-        system("cd $BACKUP_PATH && git add . && git commit -m \"backup\"");
+        system("cd $BACKUP_PATH && git add . && git commit -m \"backup\" && git clean -f -d");
         print "---------------------------------------\n\n";
     }
 }
