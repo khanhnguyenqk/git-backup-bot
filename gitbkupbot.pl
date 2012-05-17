@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
 sub getLocalBranches {
-    # Param: $workPath
-    my(@ret, $string, $workPath);
+    my($workPath) = @_;
+    my(@ret, $string);
     @ret = ();
-    $workPath = $_[0];
 
     $string = `cd $workPath && git branch`;
     my(@branches) = split(' ', $string);
@@ -17,14 +16,34 @@ sub getLocalBranches {
     return @ret;
 }
 
+sub getRemoteBranches {
+    my($workPath) = @_;
+    my(@ret, $string);
+    @ret = ();
+
+    $string = `cd $workPath && git branch -r`;
+    my(@branches) = split(' ', $string);
+    
+    foreach $branch (@branches) {
+        if ($branch ne '*') {
+            if ($branch =~ m/origin\/(.*)/) {
+                push(@ret, $1);
+            }
+            else {
+                print "Unknown remote branch: $test.\nExit.\n";
+                exit;
+            }
+        }
+    }
+    
+    return @ret;
+}
+
 sub sync {
-    # Param: $workPath, $backupPath, @branches
-    foreach $branch (@_[2..$#_]) {
+    my($branches, $workPath, $backupPath) = @_;
+    foreach $branch (@{$branches}) {
         print "=======================================\n";
 
-        my($workPath, $backupPath);
-        $workPath = $_[0];
-        $backupPath = $_[1];
 
         system("cd $workPath && git checkout $branch"); 
         print "---------------------------------------\n";
@@ -47,6 +66,20 @@ sub checkPath {
     }
 }
 
+sub getArrayDiff {
+    my ($arr1, $arr2) = @_;
+    my (@diff, %count);
+    %count = ();
+
+    foreach $item (@{$arr1}, @{$arr2}) {$count{$item}++;}
+    foreach $item (keys %count) {
+        if ($count{$item} != 2) {
+            push @diff, $item;
+        }
+    }
+    return @diff;
+}
+
 if ($#ARGV != 1) {
     print "Usage: gitbkupbot working-dir backup-dir\n";
     exit;
@@ -56,4 +89,8 @@ $workPath = $ARGV[0];
 $backupPath  = $ARGV[1];
 
 &checkPath($workPath, $backupPath);
-sync($workPath, $backupPath, getLocalBranches($workPath));
+@remote = getRemoteBranches($workPath);
+@local = getLocalBranches($workPath);
+print getArrayDiff(\@remote, \@local); 
+#@branches = getLocalBranches($workPath);
+#sync(\@branches, $workPath, $backupPath);
