@@ -20,24 +20,21 @@ sub getLocalBranches {
 sub sync {
     # Param: $workPath, $backupPath, @branches
     foreach $branch (@_[2..$#_]) {
+        print "=======================================\n";
+
         my($workPath, $backupPath);
         $workPath = $_[0];
         $backupPath = $_[1];
 
         system("cd $workPath && git checkout $branch"); 
-        print "---------------------------------------\n\n";
-
+        print "---------------------------------------\n";
         system("cd $workPath && git pull origin $branch");
-        print "---------------------------------------\n\n";
-
+        print "---------------------------------------\n";
         system("cd $backupPath && git checkout $branch");
-        print "---------------------------------------\n\n";
-
+        print "---------------------------------------\n";
         system("rsync -rav --delete --exclude .git/ $workPath $backupPath");
-        print "---------------------------------------\n\n";
-
+        print "---------------------------------------\n";
         system("cd $backupPath && git add . && git commit -m \"backup\" && git clean -f -d");
-        print "---------------------------------------\n\n";
     }
 }
 
