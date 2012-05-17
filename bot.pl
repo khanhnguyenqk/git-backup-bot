@@ -1,12 +1,13 @@
 #!/usr/bin/perl
-$WORKING_PATH="working-dir/";
-$BACKUP_PATH="backup-dir/";
 
 sub getLocalBranches {
+    # Param: $workPath
+    my(@ret, $string, $workPath);
     @ret = ();
+    $workPath = $_[0];
 
-    $string = `cd $WORKING_PATH && git branch`;
-    @branches = split(' ', $string);
+    $string = `cd $workPath && git branch`;
+    my(@branches) = split(' ', $string);
     
     foreach $branch (@branches) {
         if ($branch ne '*') {
@@ -17,23 +18,45 @@ sub getLocalBranches {
 }
 
 sub sync {
-    foreach $branch (@_) {
-        print "---------------------------------------\n";
-        system("cd $WORKING_PATH && git checkout $branch"); 
+    # Param: $workPath, $backupPath, @branches
+    foreach $branch (@_[2..$#_]) {
+        my($workPath, $backupPath);
+        $workPath = $_[0];
+        $backupPath = $_[1];
+
+        system("cd $workPath && git checkout $branch"); 
         print "---------------------------------------\n\n";
 
-        print "---------------------------------------\n";
-        system("cd $BACKUP_PATH && git checkout $branch");
+        system("cd $workPath && git pull origin $branch");
         print "---------------------------------------\n\n";
 
-        print "---------------------------------------\n";
-        system("rsync -rav --delete --exclude .git/ $WORKING_PATH $BACKUP_PATH");
+        system("cd $backupPath && git checkout $branch");
         print "---------------------------------------\n\n";
 
-        print "---------------------------------------\n";
-        system("cd $BACKUP_PATH && git add . && git commit -m \"backup\" && git clean -f -d");
+        system("rsync -rav --delete --exclude .git/ $workPath $backupPath");
+        print "---------------------------------------\n\n";
+
+        system("cd $backupPath && git add . && git commit -m \"backup\" && git clean -f -d");
         print "---------------------------------------\n\n";
     }
 }
 
-sync(getLocalBranches());
+sub checkPath {
+    # Param: @paths
+    for ($i = 0; $i < $#_ + 1; $i++) {
+        if (substr($_[$i], -1, 1) ne "/") {
+            $_[$i] = $_[$i] . "/";
+        }
+    }
+}
+
+if ($#ARGV != 1) {
+    print "Usage: gitbkup working-dir backup-dir\n";
+    exit;
+}
+
+$workPath = $ARGV[0];
+$backupPath  = $ARGV[1];
+
+&checkPath($workPath, $backupPath);
+sync($workPath, $backupPath, getLocalBranches($workPath));
