@@ -112,7 +112,9 @@ sub sync {
         system("cd $workPath && git checkout $branch"); 
 
         print "---------------------------------------\n";
-        system("cd $workPath && git pull origin $branch");
+        if (!($branch =~ m/arc_/)) {
+            system("cd $workPath && git pull origin $branch");
+        }
 
         print "---------------------------------------\n";
         system("cd $backupPath && git checkout -b $branch");
@@ -151,6 +153,18 @@ sub getArrayDiff {
     return @diff;
 }
 
+sub pushBackupToRemote {
+    print "=======================================\n";
+    print "Pushing backup git to remote\n"; 
+    my(@branches);
+    @branches = getAllLocalBranches($backupPath);
+    foreach $branch (@branches) {
+        print "---------------------------------------\n";
+        print "Pushing $branch\n";
+        system("cd $backupPath && git push origin $branch");
+    }
+}
+
 # MAIN
 if ($#ARGV != 1) {
     print "Usage: gitbkupbot working-dir backup-dir\n";
@@ -169,3 +183,4 @@ cmpRemoteLocal(\@remote, \@local);
 
 @branches = getAllLocalBranches($workPath);
 sync(\@branches);
+pushBackupToRemote();
