@@ -121,7 +121,8 @@ sub archiveLocalBranch {
     print "Archiving:$branch -> arc_$branch\n";
 
     system("cd $workPath && git checkout $branch && git branch arc_$branch");
-    system("cd $workPath && git checkout master && git branch -d $branch");
+    system("cd $workPath && git checkout master && git branch -D $branch");
+    system("cd $backupPath && git checkout master && git branch -D $branch && git push origin :$branch");
 }
 
 sub sync {
@@ -148,7 +149,7 @@ sub sync {
         system("rsync -rav --delete --exclude .git/ $workPath $backupPath");
 
         print "---------------------------------------\n";
-        system("cd $backupPath && git add . && git clean -f -d && git commit -m \"backup\"");
+        system("cd $backupPath && git add . && git add -u && git commit -m \"backup\"");
     }
 }
 
@@ -186,11 +187,11 @@ sub pushBackupToRemote {
     }
 }
 
-sub gitFetch {
+sub gitFetchRemoteInfo {
     my($path) = @_;
     print "=======================================\n";
-    print "Fetch remote branches to remote/origin\n";
-    system("cd $path && git fetch");
+    print "Fetch remote branches info in $path\n";
+    system("cd $path && git fetch && git remote prune origin");
 }
 
 
@@ -205,7 +206,7 @@ $backupPath  = $ARGV[1];
 
 &checkPath($workPath, $backupPath);
 
-gitFetch($workPath);
+gitFetchRemoteInfo($workPath);
 
 @remote = getRemoteBranches($workPath);
 @local = getNonArchivedLocalBranches($workPath);
