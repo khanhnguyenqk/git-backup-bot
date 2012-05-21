@@ -19,9 +19,12 @@ sub getNonArchivedLocalBranches {
             }
             else {
                 push(@ret, $branch);
+                print "$branch \t";
             }
         }
     }
+    print "\n";
+
     return @ret;
 }
 
@@ -39,8 +42,11 @@ sub getAllLocalBranches {
     foreach $branch (@branches) {
         if ($branch ne '*') {
             push(@ret, $branch);
+            print "$branch \t";
         }
     }
+    print "\n";
+
     return @ret;
 }
 
@@ -58,16 +64,29 @@ sub getRemoteBranches {
     foreach $branch (@branches) {
         if ($branch ne '*') {
             if ($branch =~ m/origin\/(.*)/) {
-                push(@ret, $1);
+                if ($1 eq "HEAD") {
+                    print "Ignore HEAD\n";
+                }
+                else {
+                    push(@ret, $1);
+                }
             }
             else {
-                print "Unknown remote branch: $test.\nExit.\n";
-                exit;
+                print "Unknown remote branch: $branch.\n";
             }
         }
     }
+
+    #Clean up duplication (HEAD -> master and master)
+    my %hash   = map { $_ => 1 } @ret;
+    my @unique = keys %hash;
+
+    foreach $branch (@unique) {
+        print "$branch \t";
+    }
+    print "\n";
     
-    return @ret;
+    return @unique;
 }
 
 sub cmpRemoteLocal {
@@ -124,10 +143,12 @@ sub sync {
         system("cd $backupPath && git checkout $branch");
 
         print "---------------------------------------\n";
+        print ("rsync -rav --delete --exclude .git/ $workPath $backupPath");
+
         system("rsync -rav --delete --exclude .git/ $workPath $backupPath");
 
         print "---------------------------------------\n";
-        system("cd $backupPath && git clean -f -d && git add . && git commit -m \"backup\"");
+        system("cd $backupPath && git add . && git clean -f -d && git commit -m \"backup\"");
     }
 }
 
@@ -165,6 +186,14 @@ sub pushBackupToRemote {
     }
 }
 
+sub gitFetch {
+    my($path) = @_;
+    print "=======================================\n";
+    print "Fetch remote branches to remote/origin\n";
+    system("cd $path && git fetch");
+}
+
+
 # MAIN
 if ($#ARGV != 1) {
     print "Usage: gitbkupbot working-dir backup-dir\n";
@@ -175,6 +204,8 @@ $workPath = $ARGV[0];
 $backupPath  = $ARGV[1];
 
 &checkPath($workPath, $backupPath);
+
+gitFetch($workPath);
 
 @remote = getRemoteBranches($workPath);
 @local = getNonArchivedLocalBranches($workPath);
