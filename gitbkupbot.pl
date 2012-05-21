@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-
 sub getNonArchivedLocalBranches {
     #Ignore arc_ branches
     print "=======================================\n";
@@ -196,6 +195,10 @@ sub gitFetchRemoteInfo {
 
 
 # MAIN
+@timeData = localtime(time);
+print join(' ', @timeData);
+print "\n";
+
 if ($#ARGV != 1) {
     print "Usage: gitbkupbot working-dir backup-dir\n";
     exit;
@@ -216,3 +219,6 @@ cmpRemoteLocal(\@remote, \@local);
 @branches = getAllLocalBranches($workPath);
 sync(\@branches);
 pushBackupToRemote();
+
+print "**************************************\n";
+print "END OF BACKUP\n\n";
