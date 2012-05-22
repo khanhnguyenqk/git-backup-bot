@@ -1,0 +1,82 @@
+1 0 23 21 4 112 1 141 1
+=======================================
+Fetch remote branches info in /home/.khanhnguyen/dev/repositories/TeamB/
+=======================================
+Getting all remote branches in /home/.khanhnguyen/dev/repositories/TeamB/
+Ignore HEAD
+Unknown remote branch: ->.
+test 	khanhnguyen 	master 	
+=======================================
+Getting non-archived local branches in /home/.khanhnguyen/dev/repositories/TeamB/
+Ignore arc_test
+khanhnguyen 	master 	test 	
+=======================================
+Getting all local branches in /home/.khanhnguyen/dev/repositories/TeamB/
+arc_test 	khanhnguyen 	master 	test 	
+=======================================
+---------------------------------------
+---------------------------------------
+---------------------------------------
+rsync -rav --delete --exclude .git/ /home/.khanhnguyen/dev/repositories/TeamB/ /home/.khanhnguyen/dev/repositories/TeamB-backup-temp/sending incremental file list
+
+sent 78 bytes  received 12 bytes  180.00 bytes/sec
+total size is 0  speedup is 0.00
+---------------------------------------
+# On branch arc_test
+nothing to commit (working directory clean)
+=======================================
+---------------------------------------
+Already up-to-date.
+---------------------------------------
+---------------------------------------
+rsync -rav --delete --exclude .git/ /home/.khanhnguyen/dev/repositories/TeamB/ /home/.khanhnguyen/dev/repositories/TeamB-backup-temp/sending incremental file list
+./
+khanhnguyen-test2
+khanhnguyen-test3
+
+sent 194 bytes  received 53 bytes  494.00 bytes/sec
+total size is 0  speedup is 0.00
+---------------------------------------
+# On branch khanhnguyen
+nothing to commit (working directory clean)
+=======================================
+---------------------------------------
+Already up-to-date.
+---------------------------------------
+---------------------------------------
+rsync -rav --delete --exclude .git/ /home/.khanhnguyen/dev/repositories/TeamB/ /home/.khanhnguyen/dev/repositories/TeamB-backup-temp/sending incremental file list
+./
+
+sent 68 bytes  received 15 bytes  166.00 bytes/sec
+total size is 0  speedup is 0.00
+---------------------------------------
+# On branch master
+nothing to commit (working directory clean)
+=======================================
+---------------------------------------
+Already up-to-date.
+---------------------------------------
+---------------------------------------
+rsync -rav --delete --exclude .git/ /home/.khanhnguyen/dev/repositories/TeamB/ /home/.khanhnguyen/dev/repositories/TeamB-backup-temp/sending incremental file list
+
+sent 78 bytes  received 12 bytes  180.00 bytes/sec
+total size is 0  speedup is 0.00
+---------------------------------------
+# On branch test
+nothing to commit (working directory clean)
+=======================================
+Pushing backup git to remote
+=======================================
+Getting all local branches in /home/.khanhnguyen/dev/repositories/TeamB-backup-temp/
+arc_test 	khanhnguyen 	master 	test 	
+---------------------------------------
+Pushing arc_test
+---------------------------------------
+Pushing khanhnguyen
+---------------------------------------
+Pushing master
+---------------------------------------
+Pushing test
+**************************************
+END OF BACKUP
+

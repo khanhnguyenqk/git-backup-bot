@@ -195,9 +195,8 @@ sub gitFetchRemoteInfo {
 
 
 # MAIN
-@timeData = localtime(time);
-print join(' ', @timeData);
-print "\n";
+($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+printf "%02d:%02d:%02d %02d\/%02d\/%04d\n", $hour, $min, $sec, $mon + 1, $mday, $year + 1900;
 
 if ($#ARGV != 1) {
     print "Usage: gitbkupbot working-dir backup-dir\n";
